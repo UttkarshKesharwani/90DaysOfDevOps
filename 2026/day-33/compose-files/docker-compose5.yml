@@ -1,0 +1,36 @@
+
+services:
+  wordpress:
+    image: wordpress
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+    ports:
+      - "80:80"
+    networks:
+      - wordpress-networks
+    volumes:
+      - wordpress:/var/www/html
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    networks:
+      - wordpress-networks
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  db-data:
+  wordpress:
+
+networks:
+  wordpress-networks:

@@ -1,0 +1,57 @@
+
+services:
+  web:
+    build:
+      context: ./app  # The directory containing the Dockerfile and application code
+      dockerfile: Dockerfile.multistage # Optionally specify an alternative Dockerfile name/path
+    networks:
+      - node-app-networks
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=cache
+    ports:
+      - "80:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    restart: always
+    
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: appdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - node-app-networks
+    volumes:
+      - postgres-data:/var/lib/postgresql/18/docker
+    restart: always
+
+  cache:
+    image: redis:alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - node-app-networks 
+    volumes:
+      - redis-data:/data
+
+
+networks:
+  node-app-networks:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:

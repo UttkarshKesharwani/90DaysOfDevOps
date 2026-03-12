@@ -1,0 +1,19 @@
+services:
+  web:
+    build: ../app
+    ports: 
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      REDIS_HOST: cache
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: appdb
+
+  cache:
+    image: redis
+    

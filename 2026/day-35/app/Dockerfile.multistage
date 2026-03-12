@@ -1,0 +1,26 @@
+
+FROM node:20-slim AS builder
+
+WORKDIR /app
+
+COPY package*.json .
+
+COPY . .
+
+RUN npm install --production
+
+
+FROM gcr.io/distroless/nodejs20-debian13 AS production
+
+WORKDIR /app
+
+COPY --from=builder /app .
+
+EXPOSE 3001
+
+# Rhe Node runtime is already the ENTRYPOINT in the distroless image. That means the container automatically runs node, so you should NOT specify ENTRYPOINT ["node"] again.
+# ENTRYPOINT [ "node" ]
+
+
+CMD [ "index.js" ]
+
