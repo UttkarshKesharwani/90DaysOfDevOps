@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Docker User Manager</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(120deg, #667eea, #764ba2);
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        width: 450px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background: #5563d6;
+      }
+
+      .user {
+        display: flex;
+        justify-content: space-between;
+        background: #f4f4f4;
+        padding: 8px;
+        margin-top: 10px;
+        border-radius: 5px;
+      }
+
+      .delete {
+        background: red;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>User Manager</h1>
+
+      <input id="name" placeholder="Name" />
+
+      <input id="email" placeholder="Email" />
+
+      <button onclick="addUser()">Add User</button>
+
+      <h3>Users</h3>
+
+      <div id="users"></div>
+    </div>
+
+    <script>
+      const API = "/api/users";
+
+      async function fetchUsers() {
+        const res = await fetch(API);
+        const users = await res.json();
+
+        const list = document.getElementById("users");
+        list.innerHTML = "";
+
+        users.forEach((u) => {
+          const div = document.createElement("div");
+          div.className = "user";
+
+          div.innerHTML = `
+<span>${u.name} (${u.email})</span>
+<button class="delete" onclick="deleteUser('${u._id}')">Delete</button>
+`;
+
+          list.appendChild(div);
+        });
+      }
+
+      async function addUser() {
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+
+        await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email }),
+        });
+
+        fetchUsers();
+      }
+
+      async function deleteUser(id) {
+        await fetch(API + "/" + id, {
+          method: "DELETE",
+        });
+
+        fetchUsers();
+      }
+
+      fetchUsers();
+    </script>
+  </body>
+</html>
