@@ -1,0 +1,26 @@
+
+
+# A Headless Service is a Service without a ClusterIP
+
+# 🟢 Headless Service
+# ❌ No virtual IP
+# ❌ No load balancing
+# ✅ Returns all Pod IPs directly via DNS
+# Client → DNS → Pod1 IP, Pod2 IP, Pod3 IP
+
+
+
+kind: Service
+apiVersion: v1 
+metadata:
+  name: nginx-headless-svc
+spec:
+  clusterIP: None # by make "None", it will become the headless service
+  selector:
+    app: nginx
+  ports:
+    - name: nginx
+      port: 80 
+      targetPort: 80
+
+
