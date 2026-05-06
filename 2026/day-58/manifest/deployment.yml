@@ -1,0 +1,47 @@
+
+kind: Deployment
+apiVersion:  apps/v1
+metadata:
+  name: php-apache
+  labels:
+    app: php
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: php
+  template:
+    metadata:
+      labels:
+        app: php
+    spec:
+      containers:
+      - name: php-container
+        image: registry.k8s.io/hpa-example
+        ports:
+        - containerPort: 80
+        env:
+          - name: PORT
+            value: "7000"
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "100Mi"
+          # limits:
+          #   cpu:  "1"
+          #   memory: "150Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5  # inital delay before send the first probe, means after the 5 sec of pod creation then it will do the first probe check
+          periodSeconds: 5 # kubelet should perform a liveness probe every 5 seconds. 
+          failureThreshold: 3 # defines How many consecutive probe failures are allowed before Kubernetes takes action(Liveness Probe -> container is restarted, Readiness Probe -> pod removed from Service but does not restart it (no traffic) ,Startup Probe -> container killed (startup failed) )
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          failureThreshold: 3
+
