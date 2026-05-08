@@ -1,0 +1,17 @@
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql-headless-service
+  namespace: capstone
+  labels:
+    app: mysql
+spec:
+  clusterIP: None
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+    
+    
